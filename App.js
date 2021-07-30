@@ -12,6 +12,7 @@ import {
 import GoalItem from './components/GoalItem';
 import GoalInput from './components/GoalInput';
 export default function App() {
+  const [isaddmode, setisaddmode] = useState(false);
   const [enteredgoal, setenteredgoal] = useState('');
   const [coursegoals, setcoursegoals] = useState([]);
   const changetexthandler = (enteredtext) => {
@@ -19,10 +20,17 @@ export default function App() {
   };
 
   const addgoalhandler = () => {
+    if (enteredgoal.length === 0) {
+      setenteredgoal('');
+      setisaddmode(false);
+      return;
+    }
     setcoursegoals((prevstate) => [
       ...prevstate,
       { key: Math.random().toString(), val: enteredgoal },
     ]);
+    setenteredgoal('');
+    setisaddmode(false);
   };
 
   const removehandler = (id) => {
@@ -30,12 +38,27 @@ export default function App() {
       return currentgoals.filter((goal) => goal.key !== id);
     });
   };
+
+  const closemodal = () => {
+    setisaddmode(false);
+  };
+
   return (
     <View style={styles.screen}>
+      <Button
+        title='Add new goal'
+        onPress={() => {
+          setisaddmode(true);
+        }}
+        style={styles.addbutton}
+      />
+
       <GoalInput
+        visible={isaddmode}
         addgoalhandler={addgoalhandler}
         enteredgoal={enteredgoal}
         changetexthandler={changetexthandler}
+        cancelgoal={closemodal}
       />
       <FlatList
         data={coursegoals}
@@ -55,5 +78,8 @@ export default function App() {
 const styles = StyleSheet.create({
   screen: {
     padding: 50,
+  },
+  addbutton: {
+    borderRadius: 5,
   },
 });
