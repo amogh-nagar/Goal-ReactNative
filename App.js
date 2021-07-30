@@ -6,8 +6,11 @@ import {
   View,
   Button,
   ScrollView,
+  FlatList,
 } from 'react-native';
 
+import GoalItem from './components/GoalItem';
+import GoalInput from './components/GoalInput';
 export default function App() {
   const [enteredgoal, setenteredgoal] = useState('');
   const [coursegoals, setcoursegoals] = useState([]);
@@ -16,27 +19,35 @@ export default function App() {
   };
 
   const addgoalhandler = () => {
-    setcoursegoals((prevstate) => [...prevstate, enteredgoal]);
+    setcoursegoals((prevstate) => [
+      ...prevstate,
+      { key: Math.random().toString(), val: enteredgoal },
+    ]);
   };
 
+  const removehandler = (id) => {
+    setcoursegoals((currentgoals) => {
+      return currentgoals.filter((goal) => goal.key !== id);
+    });
+  };
   return (
     <View style={styles.screen}>
-      <View style={styles.inputContainer}>
-        <TextInput
-          placeholder='Course Goal'
-          style={styles.input}
-          onChangeText={changetexthandler}
-          value={enteredgoal}
-        />
-        <Button onPress={addgoalhandler} title='ADD' />
-      </View>
-      <ScrollView>
-        {coursegoals.map((goal, index) => (
-          <View key={index} style={styles.goalitems}>
-            <Text>{goal}</Text>
-          </View>
-        ))}
-      </ScrollView>
+      <GoalInput
+        addgoalhandler={addgoalhandler}
+        enteredgoal={enteredgoal}
+        changetexthandler={changetexthandler}
+      />
+      <FlatList
+        data={coursegoals}
+        // keyExtractor={(item,index)=>item.id}
+        renderItem={(itemData) => (
+          <GoalItem
+            id={itemData.item.key}
+            onDelete={removehandler}
+            val={itemData.item.val}
+          />
+        )}
+      ></FlatList>
     </View>
   );
 }
@@ -44,24 +55,5 @@ export default function App() {
 const styles = StyleSheet.create({
   screen: {
     padding: 50,
-  },
-  inputContainer: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  input: {
-    width: '80%',
-    borderBottomColor: 'black',
-    borderBottomWidth: 1,
-    padding: 10,
-  },
-  goalitems: {
-    padding: 10,
-    marginVertical: 10,
-    borderColor: '#758a85',
-    backgroundColor: '#7adbe6',
-    borderWidth: 1,
   },
 });
